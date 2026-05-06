@@ -1,0 +1,7 @@
+# Hello World Agent Configuration
+name: hello_world
+description: Agent that prints a hello world greeting
+
+# Output settings
+output:
+  message: "hello world"

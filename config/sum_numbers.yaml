@@ -1,0 +1,8 @@
+# Sum Numbers Agent Configuration
+name: sum_numbers
+description: Agent that calculates the sum of two numbers
+
+# Input settings
+input:
+  a: 0
+  b: 0
