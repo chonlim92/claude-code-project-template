@@ -62,3 +62,9 @@ python agents/main.py --config config/agent.yaml
 - MCP tools should have clear descriptions for agent discovery
 - Prefer composing existing tools over creating new ones
 - Test tool access independently before integrating with agents
+
+## Agent Execution Rules
+
+- When delegating to a chat agent (via `runSubagent` or otherwise), you MUST read and follow the full behavioral instructions in its `.agent.md` body — not just use the description for routing
+- This includes: constraints, approach steps, skill-checking procedures, and required output formats (e.g., ⚠️ prefix when no skill matches)
+- The `.agent.md` body defines strict runtime behavior, not just a persona label
