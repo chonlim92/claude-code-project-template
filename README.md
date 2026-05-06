@@ -106,7 +106,3 @@ Reusable workflows that chat agents can invoke:
 - MCP tools must have clear, descriptive names and docstrings for agent discovery
 - CLI tools in `tools/` are standalone — they work both independently and when invoked by agents
 - Prefer composing existing tools over creating new ones
-
-## License
-
-See [LICENSE](LICENSE) for details.
