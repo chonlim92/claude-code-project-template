@@ -23,11 +23,47 @@ A multi-agent project template with MCP servers and CLI tools for accessing data
 
 - Python 3.10+
 - VS Code with GitHub Copilot extension (for chat agents)
-- Claude Code CLI (see installation below)
+- Claude Code CLI (requires Node.js and npm — see installation below)
 
 ### Claude Code Installation
 
+#### Node.js and npm (required)
+
+Claude Code is an npm package. Install Node.js (v18+) and npm first:
+
+**Windows:**
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+```
+
+Or download from https://nodejs.org (LTS installer includes npm).
+
+**Linux:**
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+Verify:
+
+```bash
+node --version
+npm --version
+```
+
 #### Windows
+
+```powershell
+# Create the missing npm global directory (if it doesn't exist)
+New-Item -ItemType Directory -Path "$env:APPDATA\npm" -Force
+
+# Install Claude Code globally
+npm install -g @anthropic-ai/claude-code
+```
+
+Alternatively, use the native installer:
 
 ```powershell
 irm claude.ai | iex
@@ -102,15 +138,38 @@ Execute a single instruction non-interactively:
 claude --p "Analyze the files in this directory and write a short summary to SUMMARY.md"
 ```
 
+Pre-approve specific tools to avoid interactive confirmation prompts:
+
+```bash
+claude --p "Refactor utils.py" --approvedTool edit --approvedTool bash
+```
+
+Run a specific chat agent defined in `.claude/agents/`:
+
+```bash
+claude --p "What is 9 + 27" --agent calculating
+claude --p "Say hello to the world" --agent texting
+claude --p "Calculate 5^2 then greet me" --agent orchestrator
+```
+
+> **Why `--p` and `--approvedTool`?** In automated pipelines there is no human to respond to prompts. `--p` makes execution non-interactive (no REPL). `--approvedTool` pre-authorizes tools so Claude doesn't halt at confirmation walls. Together they enable fully unattended execution.
+
 #### Python Automated Pipeline (subprocess)
 
 ```python
 import subprocess
 import os
 
-def run_claude_pipeline(prompt_text: str) -> str:
+def run_claude_pipeline(prompt_text: str, agent: str = None) -> str:
     env = os.environ.copy()
-    command = ["claude", "--p", prompt_text]
+    command = [
+        "claude", "--p", prompt_text,
+        "--approvedTool", "edit",
+        "--approvedTool", "bash",
+        "--approvedTool", "read",
+    ]
+    if agent:
+        command.extend(["--agent", agent])
 
     try:
         result = subprocess.run(
@@ -127,9 +186,13 @@ def run_claude_pipeline(prompt_text: str) -> str:
         return ""
 
 if __name__ == "__main__":
-    prompt = "Review python script syntax errors in the current directory."
-    pipeline_output = run_claude_pipeline(prompt)
-    print(f"Pipeline Execution Output:\n{pipeline_output}")
+    # Run default Claude
+    output = run_claude_pipeline("Review python script syntax errors in the current directory.")
+    print(f"Output:\n{output}")
+
+    # Run a specific agent
+    output = run_claude_pipeline("What is 9 + 27", agent="calculating")
+    print(f"Agent Output:\n{output}")
 ```
 
 See [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage.md) for the full guide.
