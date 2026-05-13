@@ -426,6 +426,12 @@ claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/
 
 For servers running locally via Docker or a binary:
 
+**With npx:**
+
+```bash
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=<YOUR_GITHUB_PAT> -e GITHUB_API_URL=<YOUR_GIT_DOMAIN> -- npx -y @modelcontextprotocol/server-github
+```
+
 **With Docker:**
 
 ```bash
