@@ -452,7 +452,9 @@ To add your own MCP server defined in the `mcp/` directory:
 claude mcp add-json mytools '{"command": "python", "args": ["mcp/server.py"], "env": {}}'
 ```
 
-### Configuring MCP for Claude Desktop
+### Configuring MCP for Claude Desktop (Not in Scope)
+
+> **Note:** Claude Desktop is a separate application and is **not in scope** for this repository. The `mcpServers` key in a JSON config file is a **Claude Desktop-only** concept. Claude Code CLI uses `.mcp.json` files managed via `claude mcp add` commands (see above). Do not confuse the two.
 
 Claude Desktop uses a JSON config file:
 
