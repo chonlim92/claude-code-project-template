@@ -217,6 +217,10 @@ See [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage
 
 MCP (Model Context Protocol) lets Claude access external tools and data sources (GitHub, databases, APIs).
 
+```
+Agent ──► Claude Code CLI ──► MCP Server ──► External Service (GitHub, DB, API, etc.)
+```
+
 ```bash
 # Add a remote MCP server (e.g., GitHub)
 claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer <YOUR_GITHUB_PAT>"}}'
@@ -234,6 +238,15 @@ claude mcp remove <server-name>
 ```
 
 **Scope options:** `--scope local` (default, you only), `--scope project` (shared via `.mcp.json`), `--scope user` (all projects).
+
+**Verify MCP setup:**
+
+```bash
+claude mcp list                  # Confirm server appears and shows "connected"
+claude mcp get <server-name>     # Check config + health status for a specific server
+```
+
+Inside a Claude Code session, type `/mcp` to see all connected servers and their available tools.
 
 > **Security:** Never hardcode tokens. Use `.env` files and add `.env` / `.mcp.json` to `.gitignore`.
 

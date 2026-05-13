@@ -429,8 +429,35 @@ For servers running locally via Docker or a binary:
 **With npx:**
 
 ```bash
+# GitHub MCP Server
 claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=<YOUR_GITHUB_PAT> -e GITHUB_API_URL=<YOUR_GIT_DOMAIN> -- npx -y @modelcontextprotocol/server-github
 ```
+
+**Jira & Confluence (via `mcp-atlassian`, requires `uvx`):**
+
+```bash
+claude mcp add mcp-atlassian \
+  -e JIRA_URL=<YOUR_JIRA_URL> \
+  -e JIRA_USERNAME=<YOUR_JIRA_EMAIL> \
+  -e JIRA_API_TOKEN=<YOUR_JIRA_API_TOKEN> \
+  -e CONFLUENCE_URL=<YOUR_CONFLUENCE_URL> \
+  -e CONFLUENCE_USERNAME=<YOUR_CONFLUENCE_EMAIL> \
+  -e CONFLUENCE_API_TOKEN=<YOUR_CONFLUENCE_API_TOKEN> \
+  -- uvx mcp-atlassian
+```
+
+> Get your Atlassian API token at https://id.atlassian.com/manage-profile/security/api-tokens.
+> For Server/Data Center, use `JIRA_PERSONAL_TOKEN` instead of `JIRA_USERNAME` + `JIRA_API_TOKEN`.
+> See https://github.com/sooperset/mcp-atlassian for full docs.
+
+**Artifactory / JFrog Platform (via Docker):**
+
+```bash
+claude mcp add jfrog -e JFROG_ACCESS_TOKEN=<YOUR_JFROG_TOKEN> -e JFROG_URL=<YOUR_JFROG_URL> -- docker run -i --rm -e JFROG_ACCESS_TOKEN -e JFROG_URL ghcr.io/jfrog/mcp-jfrog
+```
+
+> JFrog also offers an official managed (remote HTTP) MCP server for production use.
+> See https://github.com/jfrog/mcp-jfrog and https://jfrog.com/help/r/jfrog-integrations-documentation/jfrog-mcp-server.
 
 **With Docker:**
 
@@ -491,21 +518,50 @@ Example config:
 - Use scoped Personal Access Tokens with minimum required permissions
 - Review MCP server tool descriptions to understand what access you're granting
 
-### Verification & Troubleshooting
+### Verifying MCP Setup
+
+After adding a server, verify it is configured and healthy:
 
 ```bash
-# Verify server is configured
+# 1. List all configured servers — confirm your server appears
 claude mcp list
-claude mcp get <server-name>
 
-# If server isn't working
-claude mcp remove <server-name>   # Remove and re-add
+# 2. Check a specific server's config and health status
+claude mcp get <server-name>
+```
+
+`claude mcp get` shows the server's configuration, transport type, and runs a health check. A healthy server will show a status like `connected` or `ok`.
+
+**Inside a Claude Code session**, you can also verify:
+
+1. Type `/mcp` — lists all connected MCP servers and their tool counts
+2. Ask Claude to use a tool from the server (e.g., "list my GitHub repos") — if it works, the server is healthy
+
+**Expected output from `claude mcp list`:**
+
+```
+  Name          Type    Status
+  github        http    connected
+  mcp-atlassian stdio   connected
+  mytools       stdio   connected
+```
+
+If a server shows `error` or doesn't appear, see troubleshooting below.
+
+### Troubleshooting
+
+```bash
+# Remove and re-add a broken server
+claude mcp remove <server-name>
+claude mcp add ...   # re-add with corrected config
 ```
 
 **Common issues:**
 - **Auth failed**: Check token has correct scopes and hasn't expired
-- **Docker issues**: Ensure Docker Desktop is running; try `docker pull <image>`
-- **Tools not showing**: Restart Claude Code, check `/mcp` command, validate JSON syntax
+- **Server not listed**: Re-run `claude mcp add` — check for JSON syntax errors in `add-json` commands
+- **Docker issues**: Ensure Docker Desktop is running; try `docker pull <image>` first
+- **Tools not showing**: Restart Claude Code, run `/mcp` in session, validate JSON syntax
+- **`uvx` not found**: Install `uv` first (`pip install uv` or see https://docs.astral.sh/uv/)
 - **Windows path issues**: Use forward slashes or escaped backslashes in JSON
 
 See [mcp-github-server-install-claude.md](mcp-github-server-install-claude.md) for detailed GitHub MCP Server setup.
