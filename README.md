@@ -23,8 +23,43 @@ A multi-agent project template with MCP servers and CLI tools for accessing data
 
 - Python 3.10+
 - VS Code with GitHub Copilot extension (for chat agents)
+- Claude Code CLI (see installation below)
 
-### Installation
+### Claude Code Installation
+
+#### Windows
+
+```powershell
+irm claude.ai | iex
+```
+
+**Git Requirement:** Ensure Git for Windows is installed, as Claude uses Git Bash internally for execution.
+
+**Path Configuration:** If Git is not globally registered, add its fallback location inside your global `settings.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Program Files\\Git\\bin\\bash.exe"
+  }
+}
+```
+
+#### Linux
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+Alternative native installations can be pulled via GitHub Debian Build Releases for specific package management tooling.
+
+#### Initial Authentication
+
+```bash
+claude
+```
+
+### Project Installation
 
 ```bash
 # Clone the repository
@@ -50,6 +85,54 @@ python agents/sum_numbers.py 3 5
 # Run tests
 pytest
 ```
+
+### Calling an Agent
+
+#### Terminal (Interactive & Non-Interactive)
+
+Launch a direct interactive agent session:
+
+```bash
+claude
+```
+
+Execute a single instruction non-interactively:
+
+```bash
+claude --p "Analyze the files in this directory and write a short summary to SUMMARY.md"
+```
+
+#### Python Automated Pipeline (subprocess)
+
+```python
+import subprocess
+import os
+
+def run_claude_pipeline(prompt_text: str) -> str:
+    env = os.environ.copy()
+    command = ["claude", "--p", prompt_text]
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True,
+            env=env
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Pipeline error status code: {e.returncode}")
+        print(f"Error Diagnostic Info:\n{e.stderr}")
+        return ""
+
+if __name__ == "__main__":
+    prompt = "Review python script syntax errors in the current directory."
+    pipeline_output = run_claude_pipeline(prompt)
+    print(f"Pipeline Execution Output:\n{pipeline_output}")
+```
+
+See [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage.md) for the full guide.
 
 ## Agent Types
 
