@@ -16,7 +16,7 @@ For security, avoid hardcoding your token. One common approach:
 
 1. Store your token in `.env` file
 ```
-GITHUB_PAT=your_token_here
+GITHUB_PAT=<YOUR_GITHUB_PAT>
 ```
 
 2. Add to .gitignore
@@ -34,7 +34,7 @@ echo -e ".env\n.mcp.json" >> .gitignore
 
 1. Run the following command in the terminal (not in Claude Code CLI):
 ```bash
-claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer YOUR_GITHUB_PAT"}}'
+claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer <YOUR_GITHUB_PAT>"}}'
 ```
 
 With an environment variable:
@@ -57,7 +57,7 @@ claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/
 ### With Docker
 1. Run the following command in the terminal (not in Claude Code CLI):
 ```bash
-claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_GITHUB_PAT -- docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=<YOUR_GITHUB_PAT> -- docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server
 ```
 
 With an environment variable:
@@ -73,7 +73,7 @@ claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=$(grep GITHUB_PAT .env | c
 2. Add to your `PATH`
 3. Run:
 ```bash
-claude mcp add-json github '{"command": "github-mcp-server", "args": ["stdio"], "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PAT"}}'
+claude mcp add-json github '{"command": "github-mcp-server", "args": ["stdio"], "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_GITHUB_PAT>"}}'
 ```
 2. Restart Claude Code
 3. Run `claude mcp list` to see if the GitHub server is configured
@@ -89,7 +89,7 @@ claude mcp get github
 If you're using Claude Code version **2.1.0 or earlier**, use this legacy command format:
 
 ```bash
-claude mcp add --transport http github https://api.githubcopilot.com/mcp -H "Authorization: Bearer YOUR_GITHUB_PAT"
+claude mcp add --transport http github https://api.githubcopilot.com/mcp -H "Authorization: Bearer <YOUR_GITHUB_PAT>"
 ```
 
 With an environment variable:
@@ -102,7 +102,7 @@ claude mcp add --transport http github https://api.githubcopilot.com/mcp -H "Aut
 If you see `missing required argument 'name'`, put the server name immediately after `claude mcp add`:
 
 ```powershell
-$pat = "YOUR_GITHUB_PAT"
+$pat = "<YOUR_GITHUB_PAT>"
 claude mcp add github --transport http https://api.githubcopilot.com/mcp/ -H "Authorization: Bearer $pat"
 ```
 
@@ -142,7 +142,7 @@ Add this codeblock to your `claude_desktop_config.json`:
         "ghcr.io/github/github-mcp-server"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PAT"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_GITHUB_PAT>"
       }
     }
   }
@@ -158,7 +158,7 @@ Add this codeblock to your `claude_desktop_config.json`:
    - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 5. Open the file in a text editor
 6. Paste one of the code blocks above, based on your chosen configuration (remote or local)
-7. Replace `YOUR_GITHUB_PAT` with your actual token or $GITHUB_PAT environment variable
+7. Replace `<YOUR_GITHUB_PAT>` with your actual token or $GITHUB_PAT environment variable
 8. Save the file
 9. Restart Claude Desktop
 

@@ -71,7 +71,7 @@ irm claude.ai | iex
 
 **Git Requirement:** Ensure Git for Windows is installed, as Claude uses Git Bash internally for execution.
 
-**Path Configuration:** If Git is not globally registered, add its fallback location inside your global `settings.json`:
+**Path Configuration:** If Git is not globally registered, add its fallback location inside your `~/.claude/settings.json`:
 
 ```json
 {
@@ -94,6 +94,22 @@ Alternative native installations can be pulled via GitHub Debian Build Releases 
 ```bash
 claude
 ```
+
+### Claude Code Settings (`~/.claude/settings.json`)
+
+Configure Claude Code globally via `~/.claude/settings.json` (Windows: `C:\Users\<username>\.claude\settings.json`):
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_GIT_BASH_PATH": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-20250514"
+  },
+  "theme": "auto"
+}
+```
+
+For AWS Bedrock or custom endpoints, see [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage.md) for all available settings.
 
 ### Project Installation
 
@@ -196,6 +212,32 @@ if __name__ == "__main__":
 ```
 
 See [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage.md) for the full guide.
+
+### Setting Up MCP Servers
+
+MCP (Model Context Protocol) lets Claude access external tools and data sources (GitHub, databases, APIs).
+
+```bash
+# Add a remote MCP server (e.g., GitHub)
+claude mcp add-json github '{"type":"http","url":"https://api.githubcopilot.com/mcp","headers":{"Authorization":"Bearer <YOUR_GITHUB_PAT>"}}'
+
+# Add a local MCP server (e.g., Docker-based)
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=<YOUR_GITHUB_PAT> -- docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server
+
+# Add a custom project MCP server
+claude mcp add-json mytools '{"command": "python", "args": ["mcp/server.py"], "env": {}}'
+
+# Manage servers
+claude mcp list
+claude mcp get <server-name>
+claude mcp remove <server-name>
+```
+
+**Scope options:** `--scope local` (default, you only), `--scope project` (shared via `.mcp.json`), `--scope user` (all projects).
+
+> **Security:** Never hardcode tokens. Use `.env` files and add `.env` / `.mcp.json` to `.gitignore`.
+
+See [docs/claude-code-installation-usage.md](docs/claude-code-installation-usage.md) for full MCP setup details and [docs/mcp-github-server-install-claude.md](docs/mcp-github-server-install-claude.md) for GitHub MCP Server specifics.
 
 ## Agent Types
 
