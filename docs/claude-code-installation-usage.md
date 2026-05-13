@@ -378,9 +378,31 @@ claude mcp list
 # Get details of a specific server
 claude mcp get <server-name>
 
-# Remove a server
+# Remove a server (from default local scope)
 claude mcp remove <server-name>
+
+# Remove a server from a specific scope
+claude mcp remove <server-name> --scope project
+claude mcp remove <server-name> --scope user
 ```
+
+**Examples:**
+
+```bash
+# Remove the GitHub MCP server
+claude mcp remove github
+
+# Remove a project-scoped server (stored in .mcp.json at project root)
+claude mcp remove mcp-atlassian --scope project
+
+# Remove a user-scoped server (stored in ~/.claude/.mcp.json)
+claude mcp remove jfrog --scope user
+
+# Verify it's gone
+claude mcp list
+```
+
+> **Note:** `claude mcp remove` only removes from the **default (local)** scope unless you specify `--scope`. If you added a server with `--scope project`, you must also remove it with `--scope project`.
 
 ### Scope Options
 
@@ -401,6 +423,44 @@ When adding an MCP server, use `--scope` to control where the config is stored:
 | `user` | `~/.claude/.mcp.json` (global, in the user's `.claude/` folder) |
 
 Example: `claude mcp add-json myserver '...' --scope user`
+
+### Where Does `claude mcp add` Write?
+
+By default, `claude mcp add` writes to a **local** scope file — not to a shared project file. Here's what each flag does:
+
+| Command | Stores in | Scope |
+|---------|-----------|-------|
+| `claude mcp add` (default) | `<project>/.claude/.mcp.json` | Local to you, per-project, gitignored |
+| `claude mcp add --scope project` or `-s project` | `<project>/.mcp.json` | Project-level, committed & shared via git |
+| `claude mcp add --scope user` | `~/.claude/.mcp.json` | User-level, available across all projects |
+
+If you ran `claude mcp add` without `--scope project`, the config stays local to your machine (which is actually **safer** since tokens aren't committed).
+
+To share MCP config with your team, re-add with the project scope:
+
+```bash
+claude mcp add github -s project -e GITHUB_PERSONAL_ACCESS_TOKEN= -- npx -y @modelcontextprotocol/server-github
+```
+
+Or create `.mcp.json` manually in the project root:
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "",
+        "GITHUB_API_URL": "<YOUR_GIT_API_URL>"
+      }
+    }
+  }
+}
+```
+
+> **Security:** If you commit `.mcp.json`, do **not** put secrets in it — use empty placeholder values and set the real tokens as system environment variables or in a `.env` file. The default local scope (`<project>/.claude/.mcp.json`) is safer since it stays on your machine and is gitignored.
 
 ### Adding a Remote MCP Server (Streamable HTTP)
 
@@ -450,12 +510,17 @@ claude mcp add mcp-atlassian \
 > For Server/Data Center, use `JIRA_PERSONAL_TOKEN` instead of `JIRA_USERNAME` + `JIRA_API_TOKEN`.
 > See https://github.com/sooperset/mcp-atlassian for full docs.
 
-**Artifactory / JFrog Platform (via Docker):**
+**Artifactory / JFrog Platform:**
 
 ```bash
+# Via Docker
 claude mcp add jfrog -e JFROG_ACCESS_TOKEN=<YOUR_JFROG_TOKEN> -e JFROG_URL=<YOUR_JFROG_URL> -- docker run -i --rm -e JFROG_ACCESS_TOKEN -e JFROG_URL ghcr.io/jfrog/mcp-jfrog
+
+# Via npx (directly from GitHub — no npm package published)
+claude mcp add jfrog -e JFROG_ACCESS_TOKEN=<YOUR_JFROG_TOKEN> -e JFROG_URL=<YOUR_JFROG_URL> -- npx -y github:jfrog/mcp-jfrog
 ```
 
+> The `mcp-jfrog` package is **not published to npm**. The `npx github:jfrog/mcp-jfrog` command installs directly from the GitHub repo (requires build step on first run).
 > JFrog also offers an official managed (remote HTTP) MCP server for production use.
 > See https://github.com/jfrog/mcp-jfrog and https://jfrog.com/help/r/jfrog-integrations-documentation/jfrog-mcp-server.
 
